@@ -5,7 +5,7 @@ import yt_dlp
 import requests
 
 # --- FLASK UYGULAMASI ---
-app = Flask(__name__)
+app = Flask((__name__, template_folder="templates"))
 
 # --- TEMEL DEĞİŞKENLER ---
 USERS_DIR = 'Users'
