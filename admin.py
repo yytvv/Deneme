@@ -1,7 +1,8 @@
 import json
 import sys
 
-ARTISTS_FILE = 'artists.json'
+# DEĞİŞİKLİK: Dosya adı 'artists.json' yerine 'adminlinks.json' olarak güncellendi.
+ARTISTS_FILE = 'adminlinks.json'
 
 def load_artists():
     """Sanatçı listesini JSON dosyasından yükler."""
@@ -10,6 +11,8 @@ def load_artists():
             data = json.load(f)
             return data.get('artists', [])
     except (FileNotFoundError, json.JSONDecodeError):
+        # Dosya yoksa, boş bir liste ile oluştur.
+        save_artists([])
         return []
 
 def save_artists(artists):
@@ -57,7 +60,7 @@ def print_help():
     print("remove \"Sanatçı Adı\"      : Bir sanatçıyı siler (tırnak işareti kullanın).")
     print("help                      : Bu yardım menüsünü gösterir.")
     print("---------------------------------")
-    print("\nÖrnek: python Admin.py add \"blok3\"")
+    print("\nÖrnek: python Admin.py add \"Uzi\"")
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -77,4 +80,5 @@ if __name__ == '__main__':
     else:
         print("Hatalı komut veya eksik parametre.")
         print_help()
+
 
