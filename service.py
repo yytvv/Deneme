@@ -5,9 +5,10 @@ from ytmusicapi import YTMusic
 import yt_dlp
 
 class MusicDataService:
-    def __init__(self, artists_file='artists.json', links_file='Links.json'):
+    def __init__(self, links_file='Links.json'):
         self.ytmusic = YTMusic()
-        self.artists_file = artists_file
+        # DEĞİŞİKLİK: Sanatçı dosyası adı doğrudan 'adminlinks.json' olarak ayarlandı.
+        self.artists_file = 'adminlinks.json'
         self.links_file = links_file
         self.links_data = self._load_json(self.links_file, {})
 
@@ -33,7 +34,7 @@ class MusicDataService:
         print("Müzik verileri güncelleniyor...")
         artists = self._get_artists_from_file()
         if not artists:
-            print("Sanatçı listesi boş. Lütfen Admin.py ile sanatçı ekleyin.")
+            print(f"Sanatçı listesi ({self.artists_file}) boş. Lütfen Admin.py ile sanatçı ekleyin.")
             return
 
         for artist_name in artists:
@@ -107,4 +108,5 @@ if __name__ == '__main__':
     while True:
         schedule.run_pending()
         time.sleep(1)
+
 
