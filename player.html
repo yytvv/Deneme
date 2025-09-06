@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çalınıyor</title>
+    <style>
+        /* Genel Stiller */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        :root {
+            --background: #121212;
+            --surface: #1e1e1e;
+            --primary: #1DB954;
+            --text-primary: #FFFFFF;
+            --text-secondary: #b3b3b3;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.6), var(--background)), var(--background);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .player-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        #album-art {
+            width: 100%;
+            max-width: 350px;
+            aspect-ratio: 1/1;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+        }
+        #song-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        #artist-album {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            margin: 30px 0;
+        }
+        /* İlerleme çubuğu ve kontroller eklenecek */
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .controls button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 2rem;
+        }
+        .controls .play-pause {
+            font-size: 3.5rem;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <img id="album-art" src="https://placehold.co/544x544/222/fff?text=Müzik" alt="Albüm Kapağı">
+        <h2 id="song-title">Şarkı Adı</h2>
+        <p id="artist-album">Sanatçı - Albüm</p>
+        
+        <div class="progress-bar-container">
+            <!-- İlerleme çubuğu buraya eklenecek -->
+        </div>
+
+        <div class="controls">
+            <button id="prev-btn">⏮️</button>
+            <button id="play-pause-btn" class="play-pause">▶️</button>
+            <button id="next-btn">⏭️</button>
+        </div>
+    </div>
+    
+    <script>
+        // Bu sayfanın JS'i, tüm uygulama genelinde paylaşılan bir
+        // müzik çalar durumu (state) ile senkronize çalışmalıdır.
+        // Örneğin, Index.html'deki mini player'da bir şarkı çalmaya
+        // başladığında bu sayfadaki bilgiler de güncellenmelidir.
+    </script>
+</body>
+</html>
+
+  
