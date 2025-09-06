@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anasayfa - Müzik</title>
+    <style>
+        /* Genel Stil Tanımları (Login.html'dekine benzer) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        :root {
+            --background: #121212;
+            --surface: #181818;
+            --surface-hover: #282828;
+            --primary: #1DB954;
+            --text-primary: #FFFFFF;
+            --text-secondary: #b3b3b3;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            padding-bottom: 90px; /* Alttaki player için boşluk */
+        }
+        .container {
+            display: flex;
+        }
+        .sidebar {
+            width: 240px;
+            background-color: #000;
+            height: 100vh;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h1 { font-size: 1.5rem; margin-bottom: 24px; }
+        .sidebar nav a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 10px 0;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover { color: var(--text-primary); }
+        
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            height: calc(100vh - 90px);
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .song-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .song-card {
+            background-color: var(--surface);
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .song-card:hover { background-color: var(--surface-hover); }
+        .song-card img {
+            width: 100%;
+            border-radius: 6px;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+        .song-card .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .song-card .artist { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+        
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 90px;
+            background-color: var(--surface);
+            border-top: 1px solid #282828;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        /* Responsive Tasarım */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { padding: 16px; height: calc(100vh - 70px - 60px); } /* Player ve alt nav için boşluk */
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 90px; /* Player'ın üstünde */
+                left: 0;
+                width: 100%;
+                background-color: var(--surface);
+                justify-content: space-around;
+                padding: 10px 0;
+                border-top: 1px solid #282828;
+            }
+            .bottom-nav a { text-decoration: none; color: var(--text-secondary); text-align: center; }
+            .bottom-nav a.active { color: var(--primary); }
+            body { padding-bottom: 150px; }
+        }
+        @media (min-width: 769px) {
+            .bottom-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Masaüstü Yan Panel -->
+        <aside class="sidebar">
+            <h1>Müzik</h1>
+            <nav>
+                <a href="/" class="active">Anasayfa</a>
+                <a href="/search">Ara</a>
+                <a href="/library">Kitaplığım</a>
+            </nav>
+        </aside>
+
+        <!-- Ana İçerik -->
+        <main class="main-content">
+            <h2 class="section-title">Sana Özel Öneriler</h2>
+            <div id="recommendations-grid" class="song-grid">
+                <!-- Şarkılar buraya JS ile eklenecek -->
+            </div>
+            
+            <h2 class="section-title" style="margin-top: 40px;">Popüler</h2>
+            <div id="popular-grid" class="song-grid">
+                <!-- Şarkılar buraya JS ile eklenecek -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Müzik Çalar Paneli -->
+    <div class="player-bar">
+        <!-- Çalar içeriği Player.html veya ayrı bir component olarak eklenebilir -->
+        <span>Şu an çalan şarkı bilgisi...</span>
+        <div>Kontroller</div>
+    </div>
+
+    <!-- Mobil Alt Navigasyon -->
+    <nav class="bottom-nav">
+        <a href="/" class="active">Anasayfa</a>
+        <a href="/search">Ara</a>
+        <a href="/library">Kitaplığım</a>
+    </nav>
+
+    <audio id="audio-player" preload="auto"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Kullanıcı girişi kontrolü
+            const currentUser = localStorage.getItem('music_platform_user');
+            if (!currentUser) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            const recommendationsGrid = document.getElementById('recommendations-grid');
+            const popularGrid = document.getElementById('popular-grid');
+            const audioPlayer = document.getElementById('audio-player');
+
+            const createSongCard = (song) => {
+                const card = document.createElement('div');
+                card.className = 'song-card';
+                card.dataset.songId = song.id;
+                card.innerHTML = `
+                    <img src="${song.cover}" alt="${song.title}">
+                    <div class="title">${song.title}</div>
+                    <div class="artist">${song.artist}</div>
+                `;
+                card.addEventListener('click', () => {
+                    playSong(song.id);
+                });
+                return card;
+            };
+
+            const loadSongs = async (endpoint, gridElement) => {
+                try {
+                    const response = await fetch(endpoint);
+                    const songs = await response.json();
+                    gridElement.innerHTML = ''; // Temizle
+                    songs.forEach(song => {
+                        gridElement.appendChild(createSongCard(song));
+                    });
+                } catch (error) {
+                    console.error('Şarkılar yüklenirken hata:', error);
+                    gridElement.innerHTML = '<p>Şarkılar yüklenemedi.</p>';
+                }
+            };
+            
+            const playSong = (songId) => {
+                const streamUrl = `/stream/${songId}`;
+                audioPlayer.src = streamUrl;
+                audioPlayer.play()
+                    .then(() => console.log(`${songId} çalınıyor...`))
+                    .catch(e => console.error("Çalma hatası:", e));
+                // Player bar'ı güncelle
+            };
+
+            // Sayfa yüklendiğinde şarkıları yükle
+            loadSongs('/api/recommendations', recommendationsGrid);
+            // loadSongs('/api/popular', popularGrid); // Popüler için ayrı bir endpoint lazım
+        });
+    </script>
+</body>
+</html>
+
