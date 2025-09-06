@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        :root {
+            --background: #121212;
+            --surface: #1e1e1e;
+            --primary: #1DB954;
+            --text-primary: #FFFFFF;
+            --text-secondary: #b3b3b3;
+            --input-bg: #2a2a2a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background-color: var(--surface);
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--input-bg);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .btn-login {
+            background-color: var(--primary);
+            color: var(--background);
+        }
+        .btn-register {
+            background-color: var(--text-secondary);
+            color: var(--background);
+        }
+        #message {
+            margin-top: 20px;
+            color: var(--primary);
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Müzik Platformu</h1>
+        <div class="form-group">
+            <label for="username">Kullanıcı Adı</label>
+            <input type="text" id="username" placeholder="Kullanıcı adınızı girin">
+        </div>
+        <div class="form-group">
+            <label for="password">Şifre</label>
+            <input type="password" id="password" placeholder="Şifrenizi girin">
+        </div>
+        <div class="button-group">
+            <button id="loginBtn" class="btn-login">Giriş Yap</button>
+            <button id="registerBtn" class="btn-register">Kayıt Ol</button>
+        </div>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cihazda kullanıcı bilgisi varsa direkt anasayfaya yönlendir
+            if (localStorage.getItem('music_platform_user')) {
+                window.location.href = '/';
+            }
+
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const messageEl = document.getElementById('message');
+
+            const handleAuth = async (endpoint) => {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (!username || !password) {
+                    messageEl.textContent = 'Kullanıcı adı ve şifre boş olamaz.';
+                    messageEl.style.color = '#E53E3E';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const result = await response.json();
+                    messageEl.textContent = result.message;
+
+                    if (response.ok) {
+                        messageEl.style.color = 'var(--primary)';
+                        // Giriş başarılıysa kullanıcı adını cihazda sakla ve anasayfaya yönlendir
+                        if(endpoint === '/api/login') {
+                            localStorage.setItem('music_platform_user', username);
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 1000);
+                        }
+                    } else {
+                        messageEl.style.color = '#E53E3E';
+                    }
+                } catch (error) {
+                    messageEl.textContent = 'Bir ağ hatası oluştu. Lütfen tekrar deneyin.';
+                    messageEl.style.color = '#E53E3E';
+                }
+            };
+
+            loginBtn.addEventListener('click', () => handleAuth('/api/login'));
+            registerBtn.addEventListener('click', () => handleAuth('/api/register'));
+        });
+    </script>
+
+</body>
+</html>
+
+  
