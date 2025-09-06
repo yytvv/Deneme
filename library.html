@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitaplığım</title>
+    <!-- Stil tanımlamaları Index.html'dekine benzer şekilde buraya eklenebilir. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        :root {
+            --background: #121212;
+            --surface: #181818;
+            --surface-hover: #282828;
+            --primary: #1DB954;
+            --text-primary: #FFFFFF;
+            --text-secondary: #b3b3b3;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            padding: 24px;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        /* Çalma listesi kartı stilleri Index.html'deki song-card'a benzer olacak */
+         .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .playlist-card {
+            background-color: var(--surface);
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .playlist-card:hover { background-color: var(--surface-hover); }
+        .playlist-card img {
+            width: 100%;
+            border-radius: 6px;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+        .playlist-card .title { font-weight: 600; }
+
+        /* Beğenilen şarkılar listesi */
+        .liked-songs-list .song-item {
+            display: flex; align-items: center; padding: 10px;
+            border-radius: 6px; cursor: pointer; transition: background-color 0.2s;
+        }
+        .liked-songs-list .song-item:hover { background-color: var(--surface-hover); }
+        .song-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px; }
+        .song-item .info { flex-grow: 1; }
+        .song-item .title { font-weight: 600; }
+        .song-item .artist { color: var(--text-secondary); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <h2 class="section-title">Çalma Listelerim</h2>
+    <div id="playlists-grid" class="playlist-grid">
+        <!-- Çalma listeleri buraya gelecek -->
+    </div>
+
+    <h2 class="section-title" style="margin-top: 40px;">Beğenilen Şarkılar</h2>
+    <div id="liked-songs-list" class="liked-songs-list">
+        <!-- Beğenilen şarkılar buraya gelecek -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem('music_platform_user');
+            if (!currentUser) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const playlistsGrid = document.getElementById('playlists-grid');
+            const likedSongsList = document.getElementById('liked-songs-list');
+
+            const loadLibraryData = async () => {
+                // Bu endpoint'in App.py'de oluşturulması gerekiyor.
+                // Örnek: /api/library/{username}
+                try {
+                    const response = await fetch(`/api/library/${currentUser}`); 
+                    const data = await response.json();
+
+                    // Çalma listelerini göster
+                    playlistsGrid.innerHTML = '';
+                    data.playlists.forEach(pl => {
+                        const card = document.createElement('div');
+                        card.className = 'playlist-card';
+                        card.innerHTML = `
+                            <img src="${pl.cover}" alt="${pl.name}">
+                            <div class="title">${pl.name}</div>
+                        `;
+                        playlistsGrid.appendChild(card);
+                    });
+
+                    // Beğenilen şarkıları göster
+                    likedSongsList.innerHTML = '';
+                    data.liked.forEach(song => {
+                        const item = document.createElement('div');
+                        item.className = 'song-item';
+                        item.innerHTML = `
+                            <img src="${song.cover}" alt="${song.title}">
+                            <div class="info">
+                                <div class="title">${song.title}</div>
+                                <div class="artist">${song.artist}</div>
+                            </div>
+                        `;
+                        likedSongsList.appendChild(item);
+                    });
+
+                } catch (error) {
+                    console.error('Kitaplık verisi yüklenemedi:', error);
+                }
+            };
+            
+            // loadLibraryData(); // App.py'de endpoint oluşturulunca aktif edilebilir.
+            
+            // Şimdilik örnek veri gösterelim
+            playlistsGrid.innerHTML = `<p style="color:var(--text-secondary)">Henüz çalma listen yok.</p>`;
+            likedSongsList.innerHTML = `<p style="color:var(--text-secondary)">Henüz şarkı beğenmedin.</p>`;
+        });
+    </script>
+</body>
+</html>
+
